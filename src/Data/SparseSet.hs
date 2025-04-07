@@ -31,3 +31,15 @@ lookup s i =
   case SV.lookup (fromIntegral i) $ sparse s of
     Just denseIndex -> Just $ dense s V.! fromIntegral denseIndex
     Nothing -> Nothing
+
+delete :: (Integral i) => i -> SparseSet i a -> SparseSet i a
+delete i s =
+  case SV.lookup (fromIntegral i) $ sparse s of
+    Just denseIndex ->
+      SparseSet
+        { dense =
+            V.take (fromIntegral denseIndex) (dense s)
+              V.++ V.drop (fromIntegral denseIndex + 1) (dense s),
+          sparse = SV.delete (fromIntegral i) (sparse s)
+        }
+    Nothing -> s
