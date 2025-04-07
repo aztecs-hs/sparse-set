@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+
 -- |
 -- Module      : Data.SparseSet
 -- Copyright   : (c) Matt Hunzinger, 2025
@@ -24,18 +27,20 @@ module Data.SparseSet
   )
 where
 
+import Control.DeepSeq
 import Data.SparseVector (SparseVector)
 import qualified Data.SparseVector as SV
 import Data.Vector (Vector)
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
+import GHC.Generics (Generic)
 import Prelude hiding (lookup)
 
 data SparseSet i a = SparseSet
   { dense :: Vector a,
     sparse :: SparseVector i
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic, NFData)
 
 empty :: SparseSet i a
 empty = SparseSet V.empty SV.empty

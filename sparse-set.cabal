@@ -15,7 +15,8 @@ library
     ghc-options:      -Wall
     build-depends:
         base >=4,
-        vector,
+        deepseq >=1,
+        vector >=0.12,
         sparse-vector
 
 executable sparse-set
@@ -46,4 +47,5 @@ benchmark sparse-set-bench
     build-depends:
         base >=4.2 && <5,
         sparse-set,
-        criterion >=1
+        criterion >=1,
+        deepseq >=1
