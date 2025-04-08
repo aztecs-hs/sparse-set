@@ -24,6 +24,7 @@ module Data.SparseSet
     -- ** Intersection
     intersection,
     intersectionWith,
+    intersectionVec,
   )
 where
 
@@ -88,6 +89,17 @@ intersection as bs =
       (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
       as' = V.map (V.unsafeIndex (dense as) . fromIntegral) (SV.toVector x)
    in SparseSet {dense = as', sparse = x'}
+
+intersectionVec ::
+  (Integral i) =>
+  SparseSet i a ->
+  SparseSet i b ->
+  Vector a
+intersectionVec as bs = SV.intersectionVecWith go (sparse as) $ sparse bs
+  where
+    go a _ = V.unsafeIndex (dense as) $ fromIntegral a
+{-# INLINE intersectionVec #-}
+
 
 intersectionWith ::
   (Integral i) =>

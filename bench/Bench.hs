@@ -5,8 +5,7 @@ import Criterion.Main
 import Data.SparseSet
 import qualified Data.SparseSet as S
 
-run :: SparseSet Int a -> SparseSet Int b -> SparseSet Int a
-run = S.intersection
+run = S.intersectionVec
 {-# NOINLINE run #-}
 
 main :: IO ()
