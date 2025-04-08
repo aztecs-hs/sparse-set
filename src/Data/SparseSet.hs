@@ -61,7 +61,7 @@ insert i a s =
 lookup :: (Integral i) => SparseSet i a -> i -> Maybe a
 lookup s i =
   case SV.lookup (fromIntegral i) $ sparse s of
-    Just denseIndex -> Just $ dense s V.! fromIntegral denseIndex
+    Just denseIndex -> Just . V.unsafeIndex (dense s) $ fromIntegral denseIndex
     Nothing -> Nothing
 {-# INLINE lookup #-}
 
@@ -86,9 +86,8 @@ intersection ::
 intersection as bs =
   let x = SV.intersection (sparse as) (sparse bs)
       (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
-      as' = V.map (\i -> dense as V.! fromIntegral i) (SV.toVector x)
+      as' = V.map (V.unsafeIndex (dense as) . fromIntegral) (SV.toVector x)
    in SparseSet {dense = as', sparse = x'}
-{-# INLINE intersection #-}
 
 intersectionWith ::
   (Integral i) =>
