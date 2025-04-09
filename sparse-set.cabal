@@ -9,7 +9,7 @@ build-type:      Simple
 extra-doc-files: CHANGELOG.md
 
 library
-    exposed-modules:  Data.SparseSet
+    exposed-modules:  Data.SparseSet, Data.SparseSet.Strict
     hs-source-dirs:   src
     default-language: Haskell2010
     ghc-options:      -Wall
@@ -48,4 +48,5 @@ benchmark sparse-set-bench
         base >=4.2 && <5,
         sparse-set,
         criterion >=1,
-        deepseq >=1
+        deepseq >=1,
+        vector >=0.12

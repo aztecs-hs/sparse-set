@@ -2,14 +2,10 @@ module Main where
 
 import Control.DeepSeq
 import Criterion.Main
-import Data.SparseSet
-import qualified Data.SparseSet as S
-
-run = S.intersectionVec
-{-# NOINLINE run #-}
+import qualified Data.SparseSet.Strict as S
 
 main :: IO ()
-main = rnf as `seq` rnf bs `seq` defaultMain [bench "intersection" $ nf (run as) bs]
+main = rnf as `seq` rnf bs `seq` defaultMain [bench "intersection" $ nf (S.intersectionVec as) bs]
   where
     (as, bs) = foldl go (S.empty, S.empty) [0 .. 10000 :: Int]
     go (s1, s2) x =
