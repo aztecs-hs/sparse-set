@@ -25,6 +25,9 @@ module Data.SparseSet
     intersection,
     intersectionWith,
     intersectionVec,
+
+    -- ** Conversion
+    toList,
   )
 where
 
@@ -100,7 +103,6 @@ intersectionVec as bs = SV.intersectionVecWith go (sparse as) $ sparse bs
     go a _ = V.unsafeIndex (dense as) $ fromIntegral a
 {-# INLINE intersectionVec #-}
 
-
 intersectionWith ::
   (Integral i) =>
   (a -> b -> c) ->
@@ -115,3 +117,10 @@ intersectionWith f as bs =
       cs = V.zipWith f as' bs'
    in SparseSet {dense = cs, sparse = x'}
 {-# INLINE intersectionWith #-}
+
+toList :: (Integral i) => SparseSet i a -> [Maybe a]
+toList s = fmap go $ SV.toList $ sparse s
+  where
+    go (Just i) = Just $ V.unsafeIndex (dense s) (fromIntegral i)
+    go Nothing = Nothing
+{-# INLINE toList #-}
