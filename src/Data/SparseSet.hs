@@ -28,14 +28,18 @@ module Data.SparseSet
 
     -- ** Conversion
     toList,
+    freeze,
+    thaw,
   )
 where
 
 import Control.DeepSeq
+import Data.SparseSet.Mutable (MSparseSet (MSparseSet))
 import Data.SparseVector (SparseVector)
 import qualified Data.SparseVector as SV
 import Data.Vector (Vector)
 import qualified Data.Vector as V
+import Data.Vector.Mutable (PrimMonad (..))
 import qualified Data.Vector.Mutable as MV
 import GHC.Generics (Generic)
 import Prelude hiding (lookup)
@@ -124,3 +128,19 @@ toList s = fmap go $ SV.toList $ sparse s
     go (Just i) = Just $ V.unsafeIndex (dense s) (fromIntegral i)
     go Nothing = Nothing
 {-# INLINE toList #-}
+
+-- | Freeze a `MSparseSet` into a `SparseSet`.
+freeze :: (PrimMonad m) => MSparseSet (PrimState m) i a -> m (SparseSet i a)
+freeze (MSparseSet d s) = do
+  d' <- V.freeze d
+  s' <- SV.freeze s
+  return $ SparseSet d' s'
+{-# INLINE freeze #-}
+
+-- | Unfreeze a `SparseSet` into a `MSparseSet`.
+thaw :: (PrimMonad m) => SparseSet i a -> m (MSparseSet (PrimState m) i a)
+thaw (SparseSet d s) = do
+  d' <- V.thaw d
+  s' <- SV.thaw s
+  return $ MSparseSet d' s'
+{-# INLINE thaw #-}

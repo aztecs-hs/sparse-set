@@ -9,7 +9,11 @@ build-type:      Simple
 extra-doc-files: CHANGELOG.md
 
 library
-    exposed-modules:  Data.SparseSet, Data.SparseSet.Strict
+    exposed-modules:
+        Data.SparseSet
+        Data.SparseSet.Strict
+        Data.SparseSet.Mutable
+
     hs-source-dirs:   src
     default-language: Haskell2010
     ghc-options:      -Wall
