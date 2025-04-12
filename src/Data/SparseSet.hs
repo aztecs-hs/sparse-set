@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
@@ -29,7 +30,9 @@ module Data.SparseSet
     -- ** Conversion
     toList,
     freeze,
+    unsafeFreeze,
     thaw,
+    unsafeThaw,
   )
 where
 
@@ -137,10 +140,24 @@ freeze (MSparseSet d s) = do
   return $ SparseSet d' s'
 {-# INLINE freeze #-}
 
+unsafeFreeze :: (PrimMonad m) => MSparseSet (PrimState m) i a -> m (SparseSet i a)
+unsafeFreeze (MSparseSet d s) = do
+  d' <- V.unsafeFreeze d
+  s' <- SV.unsafeFreeze s
+  return $ SparseSet d' s'
+{-# INLINE unsafeFreeze #-}
+
 -- | Unfreeze a `SparseSet` into a `MSparseSet`.
 thaw :: (PrimMonad m) => SparseSet i a -> m (MSparseSet (PrimState m) i a)
 thaw (SparseSet d s) = do
-  d' <- V.thaw d
-  s' <- SV.thaw s
+  !d' <- V.thaw d
+  !s' <- SV.thaw s
   return $ MSparseSet d' s'
 {-# INLINE thaw #-}
+
+unsafeThaw :: (PrimMonad m) => SparseSet i a -> m (MSparseSet (PrimState m) i a)
+unsafeThaw (SparseSet d s) = do
+  !d' <- V.unsafeThaw d
+  !s' <- SV.unsafeThaw s
+  return $ MSparseSet d' s'
+{-# INLINE unsafeThaw #-}

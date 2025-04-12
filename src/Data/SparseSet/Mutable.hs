@@ -18,6 +18,7 @@ module Data.SparseSet.Mutable
     unsafeRead,
     write,
     unsafeWrite,
+    unsafeModify,
 
     -- ** Conversion
     toList,
@@ -75,6 +76,14 @@ unsafeWrite (MSparseSet d s) i a = do
     Just i' -> V.unsafeWrite d (fromIntegral i') a
     Nothing -> return ()
 {-# INLINE unsafeWrite #-}
+
+unsafeModify :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> Int -> (a -> a) -> m ()
+unsafeModify (MSparseSet d s) i f = do
+  m <- SV.unsafeRead s i
+  case m of
+    Just i' -> V.unsafeModify d f (fromIntegral i')
+    Nothing -> return ()
+{-# INLINE unsafeModify #-}
 
 toList :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> m [Maybe (i, a)]
 toList s = do
