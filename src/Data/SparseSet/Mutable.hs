@@ -16,6 +16,12 @@ module Data.SparseSet.Mutable
     -- ** Operations
     read,
     write,
+
+    -- ** Conversion
+    toList,
+
+    -- ** Re-exports
+    PrimMonad (..),
   )
 where
 
@@ -51,3 +57,12 @@ write (MSparseSet d s) i a = do
     Just i' -> V.write d (fromIntegral i') a
     Nothing -> return ()
 {-# INLINE write #-}
+
+toList :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> m [Maybe (i, a)]
+toList s = do
+  as <- SV.toList $ sparse s
+  mapM go as
+  where
+    go (Just i) = (\a -> Just (i, a)) <$> V.unsafeRead (dense s) (fromIntegral i)
+    go Nothing = return Nothing
+{-# INLINE toList #-}
