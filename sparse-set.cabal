@@ -17,6 +17,7 @@ library
     exposed-modules:
         Data.SparseSet
         Data.SparseSet.Strict
+        Data.SparseSet.Strict.Mutable
         Data.SparseSet.Mutable
 
     hs-source-dirs:   src
