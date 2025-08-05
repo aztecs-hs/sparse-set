@@ -1,0 +1,6 @@
+packages: 
+  .
+  ../sparse-vector
+
+-- Allow newer versions of base for compatibility
+allow-newer: base
