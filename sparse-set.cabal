@@ -1,6 +1,6 @@
 cabal-version:   3.0
 name:            sparse-set
-version:         0.2.0
+version:         0.3.0
 license:         BSD-3-Clause
 license-file:    LICENSE
 maintainer:      matt@hunzinger.me
@@ -29,7 +29,7 @@ library
         base >=4 && <5,
         deepseq >=1,
         vector >=0.12,
-        sparse-vector
+        sparse-vector >=0.3
 
 executable sparse-set
     main-is:          Main.hs
