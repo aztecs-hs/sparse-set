@@ -53,6 +53,14 @@ data SparseSet i a = SparseSet
   }
   deriving (Show, Eq, Generic, NFData)
 
+instance (Integral i) => Functor (SparseSet i) where
+  fmap f s = s {dense = fmap f $ dense s}
+  {-# INLINE fmap #-}
+
+instance (Integral i) => Foldable (SparseSet i) where
+  foldMap f s = V.foldMap f $ V.catMaybes $ toVec s
+  {-# INLINE foldMap #-}
+
 empty :: SparseSet i a
 empty = SparseSet V.empty SV.empty
 {-# INLINE empty #-}
@@ -95,10 +103,11 @@ intersection ::
   SparseSet i b ->
   SparseSet i a
 intersection as bs =
-  let x = SV.intersection (sparse as) (sparse bs)
-      (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
-      as' = V.map (V.unsafeIndex (dense as) . fromIntegral) (SV.toVector x)
+  let keys = SV.intersectionVecWithKey (\i _ _ -> i) (sparse as) (sparse bs)
+      as' = SV.intersectionVecWith (\a _ -> V.unsafeIndex (dense as) $ fromIntegral a) (sparse as) (sparse bs)
+      x' = SV.fromList $ V.toList $ V.imap (\i k -> (k, fromIntegral i)) keys
    in SparseSet {dense = as', sparse = x'}
+{-# INLINE intersection #-}
 
 intersectionVec ::
   (Integral i) =>
@@ -117,12 +126,12 @@ intersectionWith ::
   SparseSet i b ->
   SparseSet i c
 intersectionWith f as bs =
-  let x = SV.intersection (sparse as) (sparse bs)
-      (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
-      as' = V.map (\i -> dense as V.! fromIntegral i) (SV.toVector x)
-      bs' = V.map (\i -> dense bs V.! fromIntegral i) (SV.toVector x)
-      cs = V.zipWith f as' bs'
+  let keys = SV.intersectionVecWithKey (\i _ _ -> i) (sparse as) (sparse bs)
+      cs = SV.intersectionVecWith go (sparse as) (sparse bs)
+      x' = SV.fromList $ V.toList $ V.imap (\i k -> (k, fromIntegral i)) keys
    in SparseSet {dense = cs, sparse = x'}
+  where
+    go a b = f (V.unsafeIndex (dense as) $ fromIntegral a) (V.unsafeIndex (dense bs) $ fromIntegral b)
 {-# INLINE intersectionWith #-}
 
 toList :: (Integral i) => SparseSet i a -> [Maybe a]
@@ -131,6 +140,12 @@ toList s = fmap go $ SV.toList $ sparse s
     go (Just i) = Just $ V.unsafeIndex (dense s) (fromIntegral i)
     go Nothing = Nothing
 {-# INLINE toList #-}
+
+toVec :: (Integral i) => SparseSet i a -> Vector (Maybe a)
+toVec s = fmap go $ SV.toVec $ sparse s
+  where
+    go i = Just $ V.unsafeIndex (dense s) (fromIntegral i)
+{-# INLINE toVec #-}
 
 -- | Freeze a `MSparseSet` into a `SparseSet`.
 freeze :: (PrimMonad m) => MSparseSet (PrimState m) i a -> m (SparseSet i a)

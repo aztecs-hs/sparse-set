@@ -55,10 +55,8 @@ read (MSparseSet d s) i = do
 
 unsafeRead :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> Int -> m (Maybe a)
 unsafeRead (MSparseSet d s) i = do
-  m <- SV.unsafeRead s i
-  case m of
-    Nothing -> return Nothing
-    Just i' -> Just <$> V.read d (fromIntegral i')
+  i' <- SV.unsafeRead s i
+  Just <$> V.read d (fromIntegral i')
 {-# INLINE unsafeRead #-}
 
 write :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> Int -> a -> m ()
@@ -71,18 +69,14 @@ write (MSparseSet d s) i a = do
 
 unsafeWrite :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> Int -> a -> m ()
 unsafeWrite (MSparseSet d s) i a = do
-  m <- SV.unsafeRead s i
-  case m of
-    Just i' -> V.unsafeWrite d (fromIntegral i') a
-    Nothing -> return ()
+  i' <- SV.unsafeRead s i
+  V.unsafeWrite d (fromIntegral i') a
 {-# INLINE unsafeWrite #-}
 
 unsafeModify :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> Int -> (a -> a) -> m ()
 unsafeModify (MSparseSet d s) i f = do
-  m <- SV.unsafeRead s i
-  case m of
-    Just i' -> V.unsafeModify d f (fromIntegral i')
-    Nothing -> return ()
+  i' <- SV.unsafeRead s i
+  V.unsafeModify d f $ fromIntegral i'
 {-# INLINE unsafeModify #-}
 
 toList :: (PrimMonad m, Integral i) => MSparseSet (PrimState m) i a -> m [Maybe (i, a)]

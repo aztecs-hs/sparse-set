@@ -96,7 +96,7 @@ intersection ::
 intersection as bs =
   let x = SV.intersection (sparse as) (sparse bs)
       (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
-      as' = V.map (V.unsafeIndex (dense as) . fromIntegral) (SV.toVector x)
+      as' = V.map (V.unsafeIndex (dense as) . fromIntegral) (SV.toVec x)
    in SparseSet {dense = as', sparse = x'}
 
 intersectionVec ::
@@ -118,8 +118,8 @@ intersectionWith ::
 intersectionWith f as bs =
   let x = SV.intersection (sparse as) (sparse bs)
       (_, x') = SV.mapAccum (\i _ -> (i + 1, i)) 0 x
-      as' = V.map (\i -> dense as V.! fromIntegral i) (SV.toVector x)
-      bs' = V.map (\i -> dense bs V.! fromIntegral i) (SV.toVector x)
+      as' = V.map (\i -> dense as V.! fromIntegral i) (SV.toVec x)
+      bs' = V.map (\i -> dense bs V.! fromIntegral i) (SV.toVec x)
       cs = V.zipWith f as' bs'
    in SparseSet {dense = cs, sparse = x'}
 {-# INLINE intersectionWith #-}

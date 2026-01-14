@@ -2,7 +2,7 @@ module Main where
 
 import Control.DeepSeq
 import Criterion.Main
-import qualified Data.SparseSet.Strict as S
+import qualified Data.SparseSet as S
 
 main :: IO ()
 main = rnf as `seq` rnf bs `seq` defaultMain [bench "intersection" $ nf (S.intersectionVec as) bs]
